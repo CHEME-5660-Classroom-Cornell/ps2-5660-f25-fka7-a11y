@@ -127,37 +127,3 @@ function 𝕍(model::MyBinomialEquityPriceTree, levels::Array{Int64,1}; startind
     # return -
     return variance_value_array;
 end
-
-function populate(model::MyBinomialEquityPriceTree, S₀::Float64, h::Float64)
-    # Initialize data structures
-    model.data = Dict{Int64, NamedTuple}()
-    model.levels = Dict{Int64, Array{Int64,1}}()
-    model.connectivity = Dict{Int64, Array{Int64,1}}()
-    
-    # Get parameters
-    u = model.u
-    d = model.d
-    p = model.p
-    T = Int(model.T)
-    
-    # Build the tree
-    node_index = 0
-    for i in 0:T
-        model.levels[i] = Int64[]
-        for j in 0:i
-            # Calculate price at this node
-            price = S₀ * (u^j) * (d^(i-j))
-            
-            # Calculate probability of reaching this node
-            prob = binomial(i, j) * (p^j) * ((1-p)^(i-j))
-            
-            # Store node
-            model.data[node_index] = (price=price, probability=prob)
-            push!(model.levels[i], node_index)
-            
-            node_index += 1
-        end
-    end
-    
-    return model
-end
